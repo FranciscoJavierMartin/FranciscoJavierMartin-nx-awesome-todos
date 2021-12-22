@@ -379,5 +379,44 @@ Use the new component in the _client_ project
 ```tsx
 import { Todos, Ui } from '@nx-awesome-todos/ui';
 
-<Todos todos={todos} />
+<Todos todos={todos} />;
+```
+
+PD: Because Nx is a monorepo (All _node_modules_ are at the root level), we can use Next.js components inside our React components like _Link_, _Image_, etc.
+
+### Setup Storybook
+
+```sh
+nx g @nrwl/react:storybook-configuration ui
+```
+
+Go to `libs/ui/src/lib/ui.stories.tsx`, add the todos to args
+
+```tsx
+import { Todo } from '@nx-awesome-todos/shared-types';
+import { Story, Meta } from '@storybook/react';
+import { Todos, TodosProps } from './todos';
+
+export default {
+  component: Todos,
+  title: 'Todos',
+} as Meta;
+
+const todos: Todo[] = [
+  { id: 1, content: 'First todo', completed: true },
+  { id: 2, content: 'Second todo', completed: false },
+];
+
+const Template: Story<TodosProps> = (args) => <Todos {...args} />;
+
+export const Primary = Template.bind({});
+Primary.args = {
+  todos,
+};
+```
+
+Run storybook on the _ui_ project
+
+```sh
+nx run ui:storybook
 ```
