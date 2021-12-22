@@ -349,3 +349,35 @@ You can create a component manually or using a command like this
 ```sh
 nx g @nrwl/react:component todos --project=ui --export
 ```
+
+Copy and paste the following content in the created component
+
+```tsx
+import { Todo } from '@nx-awesome-todos/shared-types';
+
+export interface TodosProps {
+  todos: Todo[];
+}
+
+export function Todos(props: TodosProps) {
+  return (
+    <ul>
+      {props.todos.map((t) => (
+        <li className={'todo'} key={t.id}>
+          {t.content}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default Todos;
+```
+
+Use the new component in the _client_ project
+
+```tsx
+import { Todos, Ui } from '@nx-awesome-todos/ui';
+
+<Todos todos={todos} />
+```

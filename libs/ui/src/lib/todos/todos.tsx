@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Todo } from '@nx-awesome-todos/shared-types';
 
 export interface TodosProps {
@@ -9,7 +10,7 @@ export function Todos(props: TodosProps) {
     <ul>
       {props.todos.map((t) => (
         <li className={'todo'} key={t.id}>
-          {t.content}
+          <Link href={'/details'}>{t.content}</Link>
         </li>
       ))}
     </ul>
