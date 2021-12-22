@@ -291,3 +291,46 @@ nx stylelint client
 ```
 
 ### Setup client tests
+
+Install dependencies
+
+```sh
+yarn add -D @testing-library/jest-dom
+```
+
+Create two files:
+
+`apps/client/__mocks__/fileMock.js`
+
+```js
+module.exports = 'test-file-stub';
+```
+
+`apps/client/__mocks__/styleMock.js`
+
+```js
+module.exports = {};
+```
+
+Add this two lines inside `apps/client/jest.config.js`
+
+```js
+testEnvironment: 'jsdom',
+setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+```
+
+Create file named `apps/client/jest.setup.js` with this content
+
+```js
+import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
+```
+
+Create the folder for tests named `apps/client/__tests__`. Place your tests here. You can create subfolders if you need to keep your tests organized.
+
+Run your client tests
+```sh
+nx test client
+```
+
+Note that you should mock the fetch request in order to tests works. If your project is large (and probably is because your are setting up a monorepo) you can considerer use *axios* and *moxios* to handle network requests.
