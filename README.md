@@ -269,4 +269,25 @@ nx lint client
 
 ### Setup client stylelint
 
+Install dependencies
+
+```sh
+yarn add -D stylelint nx-stylelint
+```
+
+Run setup
+
+```sh
+nx g nx-stylelint:configuration --project client
+nx g nx-stylelint:scss --project client
+```
+
+Add your rules to `.stylelintrc.json`.
+
+Run linter
+
+```sh
+nx stylelint client
+```
+
 ### Setup client tests
