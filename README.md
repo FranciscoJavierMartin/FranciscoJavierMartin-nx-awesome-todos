@@ -215,12 +215,17 @@ export function Index() {
 
 export default Index;
 ```
+
 ### Setup client styles
+
 Creat global variables and styles. Create a folder named `styles` and a file named `variables.scss`
+
 ```scss
 $test-gray: gray;
 ```
+
 Load style variables
+
 ```js
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const withNx = require('@nrwl/next/plugins/with-nx');
@@ -249,9 +254,19 @@ module.exports = withNx(nextConfig);
 ```
 
 Restart the development server for the changes to take effect.
+
 ### Setup client eslint
+
+```sh
+yarn add -D prettier eslint-plugin-prettier
+```
+
+Add prettier plugin to root .eslintrc.json. To run linter
+
+```sh
+nx lint client
+```
 
 ### Setup client stylelint
 
 ### Setup client tests
-
