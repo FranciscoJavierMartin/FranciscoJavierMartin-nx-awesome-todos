@@ -1,94 +1,257 @@
-
-
 # NxAwesomeTodos
 
-This project was generated using [Nx](https://nx.dev).
+Awesome project to learn how to setup a fullstack project with Nx
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+Tech stack
 
-🔎 **Smart, Fast and Extensible Build System**
+- TypeScript
+- Next.js
+- Express.js
+- React components
+- Storybook
 
-## Adding capabilities to your workspace
+## Setup
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+### Create the project
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+```sh
+yarn create nx-workspace
+```
 
-Below are our core plugins:
+Answer this to questions
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+- Workspace name > nx-awesome-todos
+- What to create in the new workspace > express
+- Application name > api
+- Use Nx Cloud? > No
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+### Setup API project
 
-## Generate an application
+Create file `apps/api/src/app/index.ts` and paste the following content
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+```ts
+import * as express from 'express';
 
-> You can use any of the plugins above to generate applications as well.
+const todos = [
+  {
+    id: 1,
+    content: 'First todo',
+    completed: false,
+  },
+  {
+    id: 2,
+    content: 'Second todo',
+    completed: true,
+  },
+];
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+const app = express();
 
-## Generate a library
+app.get('/api/todos', (req, res) => {
+  res.send({ todos });
+});
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+export default app;
+```
 
-> You can also use any of the plugins above to generate libraries as well.
+Replace the content of `apps/api/src/main.ts` with
 
-Libraries are shareable across libraries and applications. They can be imported from `@nx-awesome-todos/mylib`.
+```ts
+import app from './app';
 
-## Development server
+const port = process.env.port || 3333;
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+const server = app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}/api`);
+});
 
-## Code scaffolding
+server.on('error', console.error);
+```
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+Run server
 
-## Build
+```sh
+nx serve api
+```
 
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Check that everything is working making a GET request to http://localhost:3333/api/todos
 
-## Running unit tests
+### Setup API tests
 
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
+Install supertest
 
-Run `nx affected:test` to execute the unit tests affected by a change.
+```sh
+yarn add supertest
+```
 
-## Running end-to-end tests
+Create the first test at `apps/api/test/api.test.ts`
 
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
+```ts
+import * as supertest from 'supertest';
+import app from '../src/app';
 
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
+const requestWithSupertest = supertest(app);
 
-## Understand your workspace
+describe('Example describe', () => {
+  test('Example test', () => {
+    expect(1).toBe(1);
+  });
+});
 
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
+describe('Generic endpoints', () => {
+  test('GET /api/todos', async () => {
+    const res = await requestWithSupertest.get('/api/todos');
+    expect(res.status).toEqual(200);
+  });
+});
+```
 
-## Further help
+Test the app
 
-Visit the [Nx Documentation](https://nx.dev) to learn more.
+```sh
+nx test api
+```
 
+### Setup common library
 
+```sh
+nx g @nrwl/node:lib shared-types
+```
 
-## ☁ Nx Cloud
+Add an interface at `libs/shared-types/src/lib/shared-types.ts`
 
-### Distributed Computation Caching & Distributed Task Execution
+```ts
+export interface Todo {
+  id: number;
+  content: string;
+  completed: boolean;
+}
+```
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
+Import the interface at `apps/api/src/app/index.ts`
 
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
+```ts
+import { Todo } from '@nx-awesome-todos/shared-types';
+import * as express from 'express';
 
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
+const todos: Todo[] = [
+  // Rest of the code
+];
+```
 
-Visit [Nx Cloud](https://nx.app/) to learn more.
+### Setup client
+
+This command create the app and the asociate Cypress setup
+
+```sh
+ nx g @nrwl/next:app client
+```
+
+#### Setup CORS
+
+Enable CORS at server
+
+```sh
+yarn add cors
+yarn add -D @types/cors
+```
+
+Setup cors at server `apps/api/src/main.ts`
+
+```ts
+import * as cors from 'cors';
+
+app.use(cors());
+```
+
+#### Get data from server
+
+Create a file at `apps/client/pages/api/todos.ts` with this content
+
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { Todo } from '@nx-awesome-todos/shared-types';
+
+type Data = Todo[];
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
+  const response = await fetch('http://localhost:3333/api/todos');
+  const todos: Todo[] = await response.json();
+  res.status(200).json(todos);
+}
+```
+
+Change the content of `apps/client/pages/index.tsx`
+
+```tsx
+import { useEffect, useState } from 'react';
+import { Todo } from '@nx-awesome-todos/shared-types';
+import styles from './index.module.scss';
+
+export function Index() {
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  useEffect(() => {
+    fetch('/api/todos')
+      .then((res) => res.json())
+      .then((res) => setTodos(res.todos));
+  }, []);
+
+  return (
+    <div className={styles.page}>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            {todo.content} - {todo.completed ? 'completed' : 'not completed'}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Index;
+```
+### Setup client styles
+Creat global variables and styles. Create a folder named `styles` and a file named `variables.scss`
+```scss
+$test-gray: gray;
+```
+Load style variables
+```js
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withNx = require('@nrwl/next/plugins/with-nx');
+const path = require('path');
+
+/**
+ * @type {import('@nrwl/next/plugins/with-nx').WithNxOptions}
+ **/
+const nextConfig = {
+  nx: {
+    // Set this to true if you would like to to use SVGR
+    // See: https://github.com/gregberge/svgr
+    svgr: false,
+  },
+  reactStrictMode: true,
+  sassOptions: {
+    includePaths: [path.join(__dirname, 'styles')],
+    prependData: `@import "variables.scss";`,
+  },
+  images: {
+    domains: ['images.unsplash.com'],
+  },
+};
+
+module.exports = withNx(nextConfig);
+```
+
+Restart the development server for the changes to take effect.
+### Setup client eslint
+
+### Setup client stylelint
+
+### Setup client tests
+
