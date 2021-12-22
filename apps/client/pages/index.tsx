@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Todo } from '@nx-awesome-todos/shared-types';
 import styles from './index.module.scss';
+import { Todos, Ui } from '@nx-awesome-todos/ui';
 
 export function Index() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -13,13 +14,8 @@ export function Index() {
 
   return (
     <div className={styles.page}>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            {todo.content} - {todo.completed ? 'completed' : 'not completed'}
-          </li>
-        ))}
-      </ul>
+      <Ui />
+      <Todos todos={todos} />
     </div>
   );
 }

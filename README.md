@@ -329,8 +329,23 @@ import '@testing-library/jest-dom';
 Create the folder for tests named `apps/client/__tests__`. Place your tests here. You can create subfolders if you need to keep your tests organized.
 
 Run your client tests
+
 ```sh
 nx test client
 ```
 
-Note that you should mock the fetch request in order to tests works. If your project is large (and probably is because your are setting up a monorepo) you can considerer use *axios* and *moxios* to handle network requests.
+Note that you should mock the fetch request in order to tests works. If your project is large (and probably is because your are setting up a monorepo) you can considerer use _axios_ and _moxios_ to handle network requests.
+
+### Create component library
+
+```sh
+nx g @nrwl/react:lib ui
+```
+
+#### Create component
+
+You can create a component manually or using a command like this
+
+```sh
+nx g @nrwl/react:component todos --project=ui --export
+```

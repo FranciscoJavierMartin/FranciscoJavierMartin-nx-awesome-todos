@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@nx-awesome-todos/shared-types": ["libs/shared-types/src/index.ts"]
+      "@nx-awesome-todos/shared-types": ["libs/shared-types/src/index.ts"],
+      "@nx-awesome-todos/ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
